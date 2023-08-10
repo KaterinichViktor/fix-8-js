@@ -7,22 +7,17 @@ const vimeoPlayer = new Player('vimeo-player', {
 
 const storageKey = 'videoplayer-current-time';
 
-const savePlaybackTime = time => {
+const savePlaybackTime = throttle(time => {
   localStorage.setItem(storageKey, JSON.stringify(time));
-};
+}, 1000);
 
 const getSavedPlaybackTime = () => {
   const savedTime = localStorage.getItem(storageKey);
   return savedTime ? JSON.parse(savedTime) : null;
 };
 
-const updatePlaybackTime = throttle(time => {
-  savePlaybackTime(time);
-}, 1000);
-
 vimeoPlayer.on('timeupdate', event => {
-  const currentTime = event.seconds;
-  updatePlaybackTime(currentTime);
+  savePlaybackTime(event.seconds);
 });
 
 const savedTime = getSavedPlaybackTime();
@@ -30,9 +25,7 @@ if (savedTime !== null) {
   vimeoPlayer.setCurrentTime(savedTime);
 }
 
-window.addEventListener('beforeunload', () => {
-  vimeoPlayer.getCurrentTime().then(currentTime => {
-    savePlaybackTime(currentTime);
-  });
+window.addEventListener('beforeunload', async () => {
+  const currentTime = await vimeoPlayer.getCurrentTime();
+  savePlaybackTime(currentTime);
 });
-
