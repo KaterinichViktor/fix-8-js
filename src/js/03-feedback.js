@@ -76,7 +76,7 @@ feedbackForm.addEventListener('submit', (event) => {
   const messageValue = messageInput.value.trim();
 
   if (emailValue === '' || messageValue === '') {
-    alert('Заповніть всі поля перед відправкою форми.');
+    alert('Please fill in all fields');
     return;
   }
 
